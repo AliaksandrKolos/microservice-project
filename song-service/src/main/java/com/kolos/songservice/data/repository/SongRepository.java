@@ -7,5 +7,5 @@ public interface SongRepository extends JpaRepository <MetaDataSong, Long>{
 
     boolean existsByResourceId(Long resourceId);
 
-    Long deleteByResourceId(Long resourceId);
+    void deleteByResourceId(Long resourceId);
 }
