@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 group = 'com.kolos'
@@ -10,6 +11,23 @@ version = '0.0.1-SNAPSHOT'
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+bootJar {
+	archiveFileName = "app.jar"
+}
+
+jib {
+	from {
+		image = 'amazoncorretto:21-alpine'
+	}
+	to {
+		image = 'song-app-image'
+	}
+	container {
+		mainClass = 'com.kolos.songservice.SongServiceApplication'
+		ports = ['8080']
 	}
 }
 

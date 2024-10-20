@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.4'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 group = 'com.kolos'
@@ -11,6 +12,10 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
+}
+
+bootJar {
+	archiveFileName = "app.jar"
 }
 
 configurations {
@@ -23,6 +28,19 @@ repositories {
 	mavenCentral()
 }
 
+jib {
+	from {
+		image = 'amazoncorretto:21-alpine'
+	}
+	to {
+		image = 'resource-app-image'
+	}
+	container {
+		mainClass = 'com.kolos.resourceservice.ResourceServiceApplication'
+		ports = ['8080']
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -32,6 +50,9 @@ dependencies {
 	implementation 'org.apache.tika:tika-parsers:2.9.2'
 	implementation 'org.apache.tika:tika-parser-audiovideo-module:2.9.2'
 	implementation 'org.mapstruct:mapstruct:1.6.2'
+	implementation platform('software.amazon.awssdk:bom:2.28.26')
+	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:apache-client'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
