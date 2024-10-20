@@ -4,6 +4,7 @@ import com.kolos.resourceservice.client.SongClient;
 import com.kolos.resourceservice.service.dto.MetaDataDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -17,7 +18,8 @@ public class SongClientImpl implements SongClient {
 
     private final WebClient webClient;
 
-    private final String songServiceUrl = "http://localhost:8081";
+    @Value("${song.service.url}")
+    private  String songServiceUrl;
 
     @Override
     public void create(MetaDataDto metaDataDto) {

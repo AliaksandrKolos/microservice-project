@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  resource-service:
+    build: resource-service
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - resource-service-db
+      - song-service
+
+  song-service:
+    build: song-service
+    ports:
+      - "8081:8080"
+    restart: always
+    depends_on:
+      - song-service-db
+
+  resource-service-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
+    expose:
+      - "5432"
+    restart: always
+    volumes:
+      - resource-service-db:/var/lib/postgresql/data
+
+  song-service-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_SONGS}
+    expose:
+      - "5432"
+    volumes:
+      - song-service-db:/var/lib/postgresql/data
+
+volumes:
+  resource-service-db:
+  song-service-db:
