@@ -11,6 +11,7 @@ import com.kolos.resourceservice.service.dto.MetaDataDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
 import com.kolos.resourceservice.service.exception.UnsupportedTypeException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 
     @Override
+    @Transactional
     public ResourceIdDto upload(MultipartFile file) throws IOException {
         validationType(file);
         String location = getLocation();
@@ -71,6 +73,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
+    @Transactional
     public ResourceIdsDto delete(List<Long> ids) {
         List<Long> deletedIdsList = new ArrayList<>();
         ids.forEach(id -> {
