@@ -28,7 +28,9 @@ repositories {
 	mavenCentral()
 }
 
-
+ext {
+	set('springCloudVersion', "2023.0.3")
+}
 
 jib {
 	from {
@@ -52,6 +54,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation platform('software.amazon.awssdk:bom:2.28.26')
 	implementation 'software.amazon.awssdk:s3'
 	implementation 'software.amazon.awssdk:apache-client'
