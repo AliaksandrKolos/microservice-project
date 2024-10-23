@@ -53,8 +53,12 @@ public class ResourceServiceImpl implements ResourceService {
         return resourceIdDto;
     }
 
-    public Resource getResourceById(Long id) {
-        return resourceRepository.findById(id).orElseThrow(NoSuchElementException::new);
+    @Override
+    public MetaDataDto getSong(Long id) {
+        if (getResourceById(id) == null) {
+            throw new NoSuchElementException("Song not found with id:" + id);
+        }
+        return songClient.getSongByResourceId(id);
     }
 
     @Override
@@ -92,5 +96,9 @@ public class ResourceServiceImpl implements ResourceService {
     private static String getLocation() {
         UUID key = UUID.randomUUID();
         return "/music/" + key;
+    }
+
+    public Resource getResourceById(Long id) {
+        return resourceRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 }

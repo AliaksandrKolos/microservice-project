@@ -51,6 +51,15 @@ public class SongClientImpl implements SongClient {
                         .bodyToMono(String.class)
                         .block();
         log.info("Deleted data song: {}", response);
+    }
 
+    @Override
+    public MetaDataDto getSongByResourceId(Long resourceId) {
+        ServiceInstance choose = loadBalancerClient.choose(songServiceId);
+        return webClient.get()
+                .uri(choose.getUri() + "/songs/{id}", resourceId)
+                .retrieve()
+                .bodyToMono(MetaDataDto.class)
+                .block();
     }
 }
