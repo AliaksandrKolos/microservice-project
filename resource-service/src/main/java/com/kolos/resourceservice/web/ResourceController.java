@@ -1,6 +1,7 @@
 package com.kolos.resourceservice.web;
 
 import com.kolos.resourceservice.service.ResourceService;
+import com.kolos.resourceservice.service.dto.MetaDataDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,11 @@ public class ResourceController {
     @PostMapping
     public ResourceIdDto upload(@RequestParam("file") MultipartFile file) throws IOException {
         return resourceService.upload(file);
+    }
+
+    @GetMapping("/song/{id}")
+    public MetaDataDto getMetaSong(@PathVariable Long id) {
+        return resourceService.getSong(id);
     }
 
 

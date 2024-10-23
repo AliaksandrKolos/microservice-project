@@ -6,12 +6,11 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
-
-@Entity
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
+@Entity
 @Table(name = "resources")
 public class Resource {
 
@@ -20,9 +19,8 @@ public class Resource {
     @Column(name= "id")
     private Long id;
 
-    @Lob
-    @Column(name = "audio")
-    private byte[] audio;
+    @Column(name = "location")
+    private String location;
 
     @Override
     public final boolean equals(Object o) {

@@ -1,21 +1,38 @@
-version: "3.8"
 services:
   resource-service:
-    build: resource-service
+    image: resource-app-image
     ports:
       - "8080:8080"
+      - "5005:5005"
+    environment:
+      - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - RESOURCE_DB_URL=${RESOURCE_DB_URL}
+      - SONG_SERVICE_ID=${SONG_SERVICE_ID}
+      - RESOURCE_LOCALSTACK_URL=${RESOURCE_LOCALSTACK_URL}
+      - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
     restart: always
     depends_on:
       - resource-service-db
       - song-service
 
   song-service:
-    build: song-service
-    ports:
-      - "8081:8080"
+    image: song-app-image
+    expose:
+      - "8080"
     restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
     depends_on:
       - song-service-db
+    environment:
+      - SONG_DB_URL=${SONG_DB_URL}
+      - SONG_EUREKA_URL=${SONG_EUREKA_URL}
+
+  discovery-server:
+    image: discovery-app-image
+    ports:
+      - "8761:8761"
 
   resource-service-db:
     image: postgres
@@ -23,11 +40,17 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
-    expose:
-      - "5432"
+    ports:
+      - "7001:5432"
     restart: always
     volumes:
       - resource-service-db:/var/lib/postgresql/data
+
+  localstack:
+    image: localstack/localstack
+    expose:
+      - "4566"
+    restart: always
 
   song-service-db:
     image: postgres
@@ -35,8 +58,8 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB_SONGS}
-    expose:
-      - "5432"
+    ports:
+      - "7002:5432"
     volumes:
       - song-service-db:/var/lib/postgresql/data
 

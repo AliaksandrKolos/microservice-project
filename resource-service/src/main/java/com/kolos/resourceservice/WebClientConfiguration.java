@@ -1,4 +1,4 @@
-package com.kolos.resourceservice.web;
+package com.kolos.resourceservice;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
