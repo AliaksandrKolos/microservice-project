@@ -9,6 +9,7 @@ services:
       - RESOURCE_DB_URL=${RESOURCE_DB_URL}
       - SONG_SERVICE_ID=${SONG_SERVICE_ID}
       - RESOURCE_LOCALSTACK_URL=${RESOURCE_LOCALSTACK_URL}
+      - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
     restart: always
     depends_on:
       - resource-service-db
@@ -19,10 +20,19 @@ services:
     expose:
       - "8080"
     restart: always
+    deploy:
+      mode: replicated
+      replicas: 2
     depends_on:
       - song-service-db
     environment:
       - SONG_DB_URL=${SONG_DB_URL}
+      - SONG_EUREKA_URL=${SONG_EUREKA_URL}
+
+  discovery-server:
+    image: discovery-app-image
+    ports:
+      - "8761:8761"
 
   resource-service-db:
     image: postgres
