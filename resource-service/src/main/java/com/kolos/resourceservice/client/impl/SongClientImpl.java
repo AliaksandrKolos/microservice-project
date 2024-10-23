@@ -2,9 +2,12 @@ package com.kolos.resourceservice.client.impl;
 
 import com.kolos.resourceservice.client.SongClient;
 import com.kolos.resourceservice.service.dto.MetaDataDto;
+import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -17,15 +20,17 @@ import java.util.stream.Collectors;
 public class SongClientImpl implements SongClient {
 
     private final WebClient webClient;
+    private final LoadBalancerClient loadBalancerClient;
 
-    @Value("${song.service.url}")
-    private  String songServiceUrl;
+    @Value("${song.service.id}")
+    private  String songServiceId;
 
     @Override
     public void create(MetaDataDto metaDataDto) {
+        ServiceInstance choose = loadBalancerClient.choose(songServiceId);
         String response =
                 webClient.post()
-                        .uri(songServiceUrl + "/songs")
+                        .uri(choose.getUri() + "/songs")
                         .bodyValue(metaDataDto)
                         .retrieve()
                         .bodyToMono(String.class)
@@ -36,9 +41,10 @@ public class SongClientImpl implements SongClient {
 
     @Override
     public void deleteByResourceId(List<Long> resourceIds) {
+        ServiceInstance choose = loadBalancerClient.choose(songServiceId);
         String response =
                 webClient.delete()
-                        .uri(songServiceUrl + "/songs?id=" + resourceIds.stream().
+                        .uri(choose.getUri() + "/songs?id=" + resourceIds.stream().
                                 map(String::valueOf).
                                 collect(Collectors.joining(",")))
                         .retrieve()
