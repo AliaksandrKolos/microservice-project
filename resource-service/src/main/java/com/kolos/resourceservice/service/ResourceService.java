@@ -1,6 +1,7 @@
 package com.kolos.resourceservice.service;
 
 import com.kolos.resourceservice.service.dto.MetaDataDto;
+import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,5 +17,7 @@ public interface ResourceService {
 
     ResourceIdDto upload(MultipartFile file) throws IOException;
 
-    MetaDataDto getSong(Long id);
+    ResourceDto getSong(Long id);
+
+    List<ResourceDto> getAllSong() ;
 }

@@ -1,13 +1,13 @@
 package com.kolos.resourceservice.service.impl;
 
-import com.kolos.resourceservice.client.SongClient;
+import com.kolos.resourceservice.client.StorageS3Client;
 import com.kolos.resourceservice.data.entity.Resource;
 import com.kolos.resourceservice.data.repository.ResourceRepository;
-import com.kolos.resourceservice.service.MetaDataService;
+import com.kolos.resourceservice.service.MessagePublisher;
 import com.kolos.resourceservice.service.ResourceMapper;
 import com.kolos.resourceservice.service.ResourceService;
-import com.kolos.resourceservice.client.StorageS3Client;
 import com.kolos.resourceservice.service.dto.MetaDataDto;
+import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
 import com.kolos.resourceservice.service.exception.UnsupportedTypeException;
@@ -29,10 +29,9 @@ import java.util.UUID;
 public class ResourceServiceImpl implements ResourceService {
 
     private final ResourceRepository resourceRepository;
-    private final MetaDataService metaDataService;
-    private final SongClient songClient;
     private final StorageS3Client s3Client;
     private final ResourceMapper resourceMapper;
+    private final MessagePublisher messagePublisher;
 
 
     @Override
@@ -48,19 +47,9 @@ public class ResourceServiceImpl implements ResourceService {
         resource = resourceRepository.save(resource);
 
         ResourceIdDto resourceIdDto = resourceMapper.toDto(resource);
+        messagePublisher.postId(resourceIdDto.getResourceId());
 
-        MetaDataDto metaDataDto = metaDataService.getMetaData(download(resourceIdDto.getResourceId()));
-        metaDataDto.setResourceId(resource.getId());
-        songClient.create(metaDataDto);
         return resourceIdDto;
-    }
-
-    @Override
-    public MetaDataDto getSong(Long id) {
-        if (getResourceById(id) == null) {
-            throw new NoSuchElementException("Song not found with id:" + id);
-        }
-        return songClient.getSongByResourceId(id);
     }
 
     @Override
@@ -73,19 +62,35 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
+    public ResourceDto getSong(Long id) {
+        Resource resource = resourceRepository.findById(id).orElse(null);
+        if (resource == null) {
+            throw new NoSuchElementException("Song not found with id:" + id);
+        }
+        return resourceMapper.toDtoResource(resource);
+    }
+
+    @Override
+    public List<ResourceDto> getAllSong() {
+        return resourceRepository.findAll().stream()
+                .map(resourceMapper::toDtoResource)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public ResourceIdsDto delete(List<Long> ids) {
         List<Long> deletedIdsList = new ArrayList<>();
         ids.forEach(id -> {
             if (resourceRepository.existsById(id)) {
-                s3Client.delete(getResourceById(id).getLocation());
+                s3Client.delete(getSong(id).getLocation());
                 resourceRepository.deleteById(id);
                 deletedIdsList.add(id);
             }
         });
         ResourceIdsDto deletedIds = new ResourceIdsDto();
         deletedIds.setIds(deletedIdsList);
-        songClient.deleteByResourceId(deletedIdsList);
+        messagePublisher.postIds(deletedIdsList);
         return deletedIds;
     }
 
@@ -101,7 +106,4 @@ public class ResourceServiceImpl implements ResourceService {
         return "/music/" + key;
     }
 
-    public Resource getResourceById(Long id) {
-        return resourceRepository.findById(id).orElseThrow(NoSuchElementException::new);
-    }
 }
