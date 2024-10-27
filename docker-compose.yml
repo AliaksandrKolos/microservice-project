@@ -1,4 +1,23 @@
 services:
+
+  discovery-server:
+    image: discovery-app-image
+    ports:
+      - "8761:8761"
+    restart: always
+
+  resource-service-db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
+    ports:
+      - "7001:5432"
+    restart: always
+    volumes:
+      - resource-service-db:/var/lib/postgresql/data
+
   resource-service:
     image: resource-app-image
     ports:
@@ -15,6 +34,20 @@ services:
       - resource-service-db
       - song-service
 
+  resource-processor:
+    image: resource-processor-app-image
+    deploy:
+      mode: replicated
+      replicas: 3
+    restart: always
+    environment:
+      - SONG_SERVICE_ID=${SONG_SERVICE_ID}
+      - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
+      - RESOURCE_SERVICE_ID=${RESOURCE_SERVICE_ID}
+    depends_on:
+      - discovery-server
+      - message-broker
+
   song-service:
     image: song-app-image
     expose:
@@ -22,34 +55,26 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 3
     depends_on:
+      - discovery-server
       - song-service-db
     environment:
       - SONG_DB_URL=${SONG_DB_URL}
       - SONG_EUREKA_URL=${SONG_EUREKA_URL}
-
-  discovery-server:
-    image: discovery-app-image
-    ports:
-      - "8761:8761"
-
-  resource-service-db:
-    image: postgres
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
-    ports:
-      - "7001:5432"
-    restart: always
-    volumes:
-      - resource-service-db:/var/lib/postgresql/data
+      - SPRING_AMQP_DESERIALIZATION_TRUST_ALL=true
 
   localstack:
     image: localstack/localstack
     expose:
       - "4566"
+    restart: always
+
+  message-broker:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     restart: always
 
   song-service-db:
