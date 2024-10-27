@@ -1,7 +1,8 @@
 package com.kolos.resourceservice.web;
 
+import com.kolos.resourceservice.service.MessagePublisher;
 import com.kolos.resourceservice.service.ResourceService;
-import com.kolos.resourceservice.service.dto.MetaDataDto;
+import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ResourceController {
 
     private final ResourceService resourceService;
+    private final MessagePublisher messagePublisher;
 
 
     @PostMapping
@@ -25,13 +27,17 @@ public class ResourceController {
     }
 
     @GetMapping("/song/{id}")
-    public MetaDataDto getMetaSong(@PathVariable Long id) {
+    public ResourceDto getSong(@PathVariable Long id) {
         return resourceService.getSong(id);
     }
 
+    @GetMapping("/all_songs")
+    public List<ResourceDto> getAllSong() {
+        return resourceService.getAllSong();
+    }
 
     @GetMapping("/{id}")
-    public byte[] download(@PathVariable long id) {
+    public byte[] download(@PathVariable Long id) {
         return resourceService.download(id);
     }
 
