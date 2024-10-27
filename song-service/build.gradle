@@ -24,17 +24,14 @@ ext {
 
 jib {
 	from {
-		image = 'amazoncorretto:21-alpine'
+		image = 'amazoncorretto:21-alpine3.17'
 	}
 	to {
 		image = 'song-app-image'
 	}
 	container {
 		mainClass = 'com.kolos.songservice.SongServiceApplication'
-		ports = ['8080', '5005']
-		jvmFlags = [
-				'-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
-		]
+		ports = ['8080']
 	}
 }
 
@@ -56,6 +53,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

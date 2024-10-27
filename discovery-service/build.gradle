@@ -26,7 +26,7 @@ repositories {
 
 jib {
 	from {
-		image = 'amazoncorretto:21-alpine'
+		image = 'amazoncorretto:21-alpine3.17'
 	}
 	to {
 		image = 'discovery-server'
@@ -36,6 +36,7 @@ jib {
 		ports = ['8080']
 	}
 }
+
 
 ext {
 	set('springCloudVersion', "2023.0.3")
