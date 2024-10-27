@@ -31,6 +31,11 @@ public class ResourceController {
         return resourceService.getSong(id);
     }
 
+    @GetMapping("/communication-health-check")
+    public void communicationHealthCheck() {
+        messagePublisher.healthCheck();
+    }
+
     @GetMapping("/all_songs")
     public List<ResourceDto> getAllSong() {
         return resourceService.getAllSong();
