@@ -5,6 +5,7 @@ import com.kolos.resourceservice.service.ResourceService;
 import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,31 +23,37 @@ public class ResourceController {
 
 
     @PostMapping
+    @RateLimiter(name = "resourceService")
     public ResourceIdDto upload(@RequestParam("file") MultipartFile file) throws IOException {
         return resourceService.upload(file);
     }
 
     @GetMapping("/song/{id}")
+    @RateLimiter(name = "resourceService")
     public ResourceDto getSong(@PathVariable Long id) {
         return resourceService.getSong(id);
     }
 
     @GetMapping("/communication-health-check")
+    @RateLimiter(name = "resourceService")
     public void communicationHealthCheck() {
         messagePublisher.healthCheck();
     }
 
     @GetMapping("/all_songs")
+    @RateLimiter(name = "resourceService")
     public List<ResourceDto> getAllSong() {
         return resourceService.getAllSong();
     }
 
     @GetMapping("/{id}")
+    @RateLimiter(name = "resourceService")
     public byte[] download(@PathVariable Long id) {
         return resourceService.download(id);
     }
 
     @DeleteMapping
+    @RateLimiter(name = "resourceService")
     public ResourceIdsDto delete(@RequestParam("id") List<Long> ids) {
         return resourceService.delete(ids);
     }
