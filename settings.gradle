@@ -3,4 +3,5 @@ include 'resource-service'
 include 'song-service'
 include 'discovery-service'
 include 'resource-processor'
+include 'gateway-service'
 
