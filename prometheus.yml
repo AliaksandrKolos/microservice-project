@@ -1,0 +1,24 @@
+scrape_configs:
+  - job_name: 'discovery-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['discovery-service:8761']
+
+  - job_name: 'resource-processor'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'resource-processor:8080' ]
+
+  - job_name: 'resource-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'resource-service:8080' ]
+
+  - job_name: 'song-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'song-service:8080' ]
