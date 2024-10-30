@@ -3,6 +3,8 @@ package com.kolos.resourceprocessor.client.impl;
 
 import com.kolos.resourceprocessor.client.SongClient;
 import com.kolos.resourceprocessor.service.dto.MetaDataDto;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +23,12 @@ public class SongClientImpl implements SongClient {
     private final WebClient webClient;
     private final LoadBalancerClient loadBalancerClient;
 
-
     @Value("${song.service.id}")
     private  String songServiceId;
 
     @Override
+    @Retry(name = "MyRetry")
+    @Bulkhead(name = "MyBulkhead", fallbackMethod = "fallbackCreate")
     public void create(MetaDataDto metaDataDto) {
         ServiceInstance choose = loadBalancerClient.choose(songServiceId);
         String response =
@@ -37,4 +40,9 @@ public class SongClientImpl implements SongClient {
                         .block();
         log.info("Created data song: {}", response);
     }
+
+    private void fallbackCreate(MetaDataDto metaDataDto, Throwable throwable) {
+        log.error("Fallback create failed for meta data: {}. Cause: {}", metaDataDto, throwable.getMessage());
+    }
+
 }
