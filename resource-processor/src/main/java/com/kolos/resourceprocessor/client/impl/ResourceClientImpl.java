@@ -1,7 +1,7 @@
 package com.kolos.resourceprocessor.client.impl;
 
 import com.kolos.resourceprocessor.client.ResourceClient;
-import jakarta.annotation.PostConstruct;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +22,7 @@ public class ResourceClientImpl implements ResourceClient {
     private String resourceServiceId;
 
     @Override
+    @Retry(name = "MyRetry", fallbackMethod = "fallbackUploadSong")
     public byte[] uploadSong(Long id) {
         ServiceInstance choose = loadBalancerClient.choose(resourceServiceId);
 
@@ -31,4 +32,11 @@ public class ResourceClientImpl implements ResourceClient {
                 .bodyToMono(byte[].class)
                 .block();
     }
+
+    private byte[] fallbackUploadSong(Long id, Throwable e) {
+        log.error("Fallback for uploadSong with id {}. Error: {}", id, e.getMessage());
+        return new byte[0];
+    }
+
+
 }

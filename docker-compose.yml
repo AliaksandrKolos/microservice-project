@@ -70,6 +70,13 @@ services:
       - "4566"
     restart: always
 
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+
   message-broker:
     image: rabbitmq
     ports:
@@ -91,3 +98,4 @@ services:
 volumes:
   resource-service-db:
   song-service-db:
+  prometheus:

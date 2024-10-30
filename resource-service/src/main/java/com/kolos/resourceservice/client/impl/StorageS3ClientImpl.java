@@ -1,6 +1,7 @@
 package com.kolos.resourceservice.client.impl;
 
 import com.kolos.resourceservice.client.StorageS3Client;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ public class StorageS3ClientImpl implements StorageS3Client {
     private final S3Client s3Client;
 
     @Override
+    @CircuitBreaker(name = "MyCircuitBreaker", fallbackMethod = "fallbackUpload")
     public void upload(byte[] content, String key) {
         if (!bucketExists(bucket)) {
             createBucket(bucket);
@@ -31,6 +33,10 @@ public class StorageS3ClientImpl implements StorageS3Client {
         PutObjectRequest request = PutObjectRequest.builder().bucket(bucket).key(key).build();
         s3Client.putObject(request, RequestBody.fromBytes(content));
         log.info("Uploaded content to s3: {}", key);
+    }
+
+    private void fallbackUpload(byte[] content, String key, Throwable e) {
+        log.info("Upload failed for key: {}", key, e);
     }
 
     @Override
