@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,14 +22,15 @@ public class SongClientImpl implements SongClient {
     private final WebClient webClient;
     private final LoadBalancerClient loadBalancerClient;
 
-    @Value("${song.service.id}")
-    private  String songServiceId;
+    @Value("${gateway.service.id}")
+    private String gatewayServiceId;
 
     @Override
     @Retry(name = "MyRetry")
     @Bulkhead(name = "MyBulkhead", fallbackMethod = "fallbackCreate")
     public void create(MetaDataDto metaDataDto) {
-        ServiceInstance choose = loadBalancerClient.choose(songServiceId);
+        ServiceInstance choose = loadBalancerClient.choose(gatewayServiceId);
+
         String response =
                 webClient.post()
                         .uri(choose.getUri() + "/songs")
