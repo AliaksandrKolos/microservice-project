@@ -26,7 +26,6 @@ services:
     environment:
       - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       - RESOURCE_DB_URL=${RESOURCE_DB_URL}
-      - SONG_SERVICE_ID=${SONG_SERVICE_ID}
       - RESOURCE_LOCALSTACK_URL=${RESOURCE_LOCALSTACK_URL}
       - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
     restart: always
@@ -41,9 +40,8 @@ services:
       replicas: 3
     restart: always
     environment:
-      - SONG_SERVICE_ID=${SONG_SERVICE_ID}
       - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
-      - RESOURCE_SERVICE_ID=${RESOURCE_SERVICE_ID}
+      - GATEWAY_SERVICE_ID=${GATEWAY_SERVICE_ID}
     depends_on:
       - discovery-server
       - message-broker
@@ -87,10 +85,11 @@ services:
   gateway-service:
     image: gateway-app-image
     ports:
-      - "7070:7070"
+      - "7070:8080"
       - "5000:5000"
     environment:
       - GATEWAY_EUREKA_URL=${GATEWAY_EUREKA_URL}
+    restart: always
 
   song-service-db:
     image: postgres
