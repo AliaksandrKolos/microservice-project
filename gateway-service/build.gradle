@@ -27,10 +27,10 @@ jib {
         image = 'gateway-app-image'
     }
     container {
-        mainClass = 'com.kolos.GatewayServiceApplication'
-        ports = ['7070', '5005']
+        mainClass = 'com.kolos.gatewayservice.GatewayServiceApplication'
+        ports = ['7070', '5000']
         jvmFlags = [
-                '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+                '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5000'
         ]
     }
 }
@@ -40,13 +40,14 @@ ext {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
+    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
