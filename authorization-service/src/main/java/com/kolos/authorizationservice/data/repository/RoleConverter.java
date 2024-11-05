@@ -1,6 +1,6 @@
-package com.kolos.securityservice.data.converters;
+package com.kolos.authorizationservice.data.repository;
 
-import com.kolos.securityservice.data.entity.User;
+import com.kolos.authorizationservice.data.entity.User;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
