@@ -1,0 +1,33 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: ${GATEWAY_EUREKA_URL}
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: resource-service
+          uri: lb://resource-service
+          predicates:
+            - Path=/resources/**
+          filters:
+            - AuthenticationFilter
+
+        - id: song-service
+          uri: lb://song-service
+          predicates:
+            - Path=/songs/**
+          filters:
+            - AuthenticationFilter
+
+        - id: authorization-service
+          uri: lb://authorization-service
+          predicates:
+            - Path=/auth/**
+
+security:
+  key: ${SECURITY_KEY}

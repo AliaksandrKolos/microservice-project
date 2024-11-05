@@ -18,13 +18,13 @@ public class ResourceClientImpl implements ResourceClient {
     private final WebClient webClient;
     private final LoadBalancerClient loadBalancerClient;
 
-    @Value("${resource.service.id}")
-    private String resourceServiceId;
+    @Value("${gateway.service.id}")
+    private String gatewayServiceId;
 
     @Override
     @Retry(name = "MyRetry", fallbackMethod = "fallbackUploadSong")
     public byte[] uploadSong(Long id) {
-        ServiceInstance choose = loadBalancerClient.choose(resourceServiceId);
+        ServiceInstance choose = loadBalancerClient.choose(gatewayServiceId);
 
         return webClient.get()
                 .uri(choose.getUri() + "/resources/{id}", id)
