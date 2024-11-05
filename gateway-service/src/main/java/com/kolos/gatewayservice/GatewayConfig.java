@@ -10,15 +10,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GatewayConfig {
 
-    @Bean
-    public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route("resource-service", p -> p
-                        .path("/resources/**")
-                        .uri("lb://resource-service"))
-                .route("song-service", p -> p
-                        .path("/songs/**")
-                        .uri("lb://song-service"))
-                .build();
-    }
+//    @Bean
+//    public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route("resource-service", p -> p
+//                        .path("/resources/**")
+//                        .uri("lb://resource-service"))
+//                .route("song-service", p -> p
+//                        .path("/songs/**")
+//                        .uri("lb://song-service"))
+//                .build();
+//    }
 }
