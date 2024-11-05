@@ -6,18 +6,6 @@ services:
       - "8761:8761"
     restart: always
 
-  resource-service-db:
-    image: postgres
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
-    ports:
-      - "7001:5432"
-    restart: always
-    volumes:
-      - resource-service-db:/var/lib/postgresql/data
-
   resource-service:
     image: resource-app-image
     ports:
@@ -33,11 +21,54 @@ services:
       - resource-service-db
       - song-service
 
+  resource-service-db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_RESOURCES}
+    ports:
+      - "7001:5432"
+    restart: always
+    volumes:
+      - resource-service-db:/var/lib/postgresql/data
+
+
+  authorization-service:
+    image: authorization-app-image
+    ports:
+      - "8585:8080"
+      - "5007:5007"
+    environment:
+      - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007
+      - AUTHORIZATION_DB_URL=${AUTHORIZATION_DB_URL}
+      - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
+      - SECURITY_KEY=${SECURITY_KEY}
+    restart: always
+    depends_on:
+      - authorization-service-db
+
+
+  authorization-service-db:
+    image: postgres:17-alpine
+    restart: always
+    ports:
+      - "7003:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_USERS}
+    volumes:
+      - authorization-service-db:/var/lib/postgresql/data
+      - ./users_schema.sql:/docker-entrypoint-initdb.d/users_schema.sql
+
+
+
   resource-processor:
     image: resource-processor-app-image
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     restart: always
     environment:
       - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
@@ -53,7 +84,7 @@ services:
     restart: always
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     depends_on:
       - discovery-server
       - song-service-db
@@ -61,6 +92,19 @@ services:
       - SONG_DB_URL=${SONG_DB_URL}
       - SONG_EUREKA_URL=${SONG_EUREKA_URL}
       - SPRING_AMQP_DESERIALIZATION_TRUST_ALL=true
+
+  song-service-db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_SONGS}
+    ports:
+      - "7002:5432"
+    volumes:
+      - song-service-db:/var/lib/postgresql/data
+
+
 
   localstack:
     image: localstack/localstack
@@ -89,20 +133,13 @@ services:
       - "5000:5000"
     environment:
       - GATEWAY_EUREKA_URL=${GATEWAY_EUREKA_URL}
+      - SECURITY_KEY=${SECURITY_KEY}
     restart: always
 
-  song-service-db:
-    image: postgres
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB_SONGS}
-    ports:
-      - "7002:5432"
-    volumes:
-      - song-service-db:/var/lib/postgresql/data
+
 
 volumes:
   resource-service-db:
   song-service-db:
+  authorization-service-db:
   prometheus:
