@@ -1,4 +1,4 @@
-package com.kolos.securityservice.data.entity;
+package com.kolos.authorizationservice.data.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,6 +19,9 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "role_id")
+    private Role role;
 
 
     public enum Role implements GrantedAuthority {
