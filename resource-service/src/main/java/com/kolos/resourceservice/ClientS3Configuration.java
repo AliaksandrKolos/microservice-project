@@ -18,10 +18,10 @@ public class ClientS3Configuration {
     @Value("${clients.S3.Url}")
     private String S3ClientUrl;
 
-    @Value("${clients.s3.access_key}")
+    @Value("${clients.S3.access_key}")
     private String s3AccessKey;
 
-    @Value("${clients_s3_secret_key}")
+    @Value("${clients_S3_secret_key}")
     private String s3SecretKey;
 
     @Bean
