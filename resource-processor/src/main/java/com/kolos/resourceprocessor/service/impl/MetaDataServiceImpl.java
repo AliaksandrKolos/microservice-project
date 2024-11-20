@@ -3,6 +3,7 @@ package com.kolos.resourceprocessor.service.impl;
 
 import com.kolos.resourceprocessor.service.MetaDataService;
 import com.kolos.resourceprocessor.service.dto.MetaDataDto;
+import com.kolos.resourceprocessor.service.exception.MetadataProcessingException;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.mp3.Mp3Parser;
@@ -33,7 +34,7 @@ public class MetaDataServiceImpl implements MetaDataService {
             return metaDataDto;
 
         } catch (TikaException | IOException | SAXException e) {
-            throw new RuntimeException(e);
+            throw new MetadataProcessingException("Failed to process metadata ", e);
         }
     }
 
