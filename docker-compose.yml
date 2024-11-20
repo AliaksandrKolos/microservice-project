@@ -12,6 +12,8 @@ services:
       - "8080:8080"
       - "5005:5005"
     environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
       - RESOURCE_DB_URL=${RESOURCE_DB_URL}
       - RESOURCE_LOCALSTACK_URL=${RESOURCE_LOCALSTACK_URL}
@@ -40,6 +42,8 @@ services:
       - "8585:8080"
       - "5007:5007"
     environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007
       - AUTHORIZATION_DB_URL=${AUTHORIZATION_DB_URL}
       - RESOURCE_EUREKA_URL=${RESOURCE_EUREKA_URL}
@@ -89,6 +93,8 @@ services:
       - discovery-server
       - song-service-db
     environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SONG_DB_URL=${SONG_DB_URL}
       - SONG_EUREKA_URL=${SONG_EUREKA_URL}
       - SPRING_AMQP_DESERIALIZATION_TRUST_ALL=true

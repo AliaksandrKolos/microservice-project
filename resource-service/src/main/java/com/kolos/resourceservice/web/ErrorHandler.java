@@ -1,32 +1,30 @@
 package com.kolos.resourceservice.web;
 
+import com.kolos.resourceservice.service.exception.InvalidInputException;
 import com.kolos.resourceservice.service.exception.UnsupportedTypeException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public void serverError(Exception e) {
-        log.error("Server error: ", e);
-    }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NoSuchElementException.class)
-    public void notFound(NoSuchElementException e) {
-        log.info("Not found: ", e);
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>>invalidInputException(InvalidInputException e) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -47,6 +45,11 @@ public class ErrorHandler {
         return "Unknown host: " + e.getMessage();
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchElementException.class)
+    public void notFound(NoSuchElementException e) {
+        log.info("Not found: ", e);
+    }
 }
 
 

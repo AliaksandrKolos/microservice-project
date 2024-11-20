@@ -5,6 +5,7 @@ import com.kolos.authorizationservice.data.repository.UserCredentialRepository;
 import com.kolos.authorizationservice.service.AuthService;
 import com.kolos.authorizationservice.service.JwtService;
 import com.kolos.authorizationservice.service.dto.AuthRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public String saveUser(AuthRequest authRequest) {
         log.info("Saving user {}", authRequest);
         User createUser = new User();

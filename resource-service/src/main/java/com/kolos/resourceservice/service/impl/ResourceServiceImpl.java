@@ -6,10 +6,10 @@ import com.kolos.resourceservice.data.repository.ResourceRepository;
 import com.kolos.resourceservice.service.MessagePublisher;
 import com.kolos.resourceservice.service.ResourceMapper;
 import com.kolos.resourceservice.service.ResourceService;
-import com.kolos.resourceservice.service.dto.MetaDataDto;
 import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;
+import com.kolos.resourceservice.service.exception.InvalidInputException;
 import com.kolos.resourceservice.service.exception.UnsupportedTypeException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,8 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourceMapper resourceMapper;
     private final MessagePublisher messagePublisher;
 
+    private static final String SUPPORTED_CONTENT_TYPE = "audio/mpeg";
+
 
     @Override
     @Transactional
@@ -54,6 +56,9 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public byte[] download(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Id is null");
+        }
         Resource resource = resourceRepository.findById(id).orElse(null);
         if (resource == null) {
             throw new NoSuchElementException("Resource not found with id:" + id);
@@ -63,6 +68,9 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ResourceDto getSong(Long id) {
+        if (id == null) {
+            throw new InvalidInputException("Id is null");
+        }
         Resource resource = resourceRepository.findById(id).orElse(null);
         if (resource == null) {
             throw new NoSuchElementException("Song not found with id:" + id);
@@ -80,6 +88,9 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     @Transactional
     public ResourceIdsDto delete(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            throw new InvalidInputException("Ids is null or empty");
+        }
         List<Long> deletedIdsList = new ArrayList<>();
         ids.forEach(id -> {
             if (resourceRepository.existsById(id)) {
@@ -94,12 +105,19 @@ public class ResourceServiceImpl implements ResourceService {
         return deletedIds;
     }
 
+
+
     private static void validationType(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new InvalidInputException("File cannot be null or empty");
+        }
+
         String contentType = file.getContentType();
-        if (!"audio/mpeg".equals(contentType)) {
-            throw new UnsupportedTypeException("Unsupported media type: " + contentType);
+        if (!SUPPORTED_CONTENT_TYPE.equals(contentType)) {
+            throw new UnsupportedTypeException("Unsupported media type: " + (contentType != null ? contentType : "null"));
         }
     }
+
 
     private static String getLocation() {
         UUID key = UUID.randomUUID();

@@ -1,6 +1,5 @@
 package com.kolos.resourceservice.service;
 
-import com.kolos.resourceservice.service.dto.MetaDataDto;
 import com.kolos.resourceservice.service.dto.ResourceDto;
 import com.kolos.resourceservice.service.dto.ResourceIdDto;
 import com.kolos.resourceservice.service.dto.ResourceIdsDto;

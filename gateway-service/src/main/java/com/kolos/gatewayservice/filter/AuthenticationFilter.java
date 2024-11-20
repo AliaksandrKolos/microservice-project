@@ -1,6 +1,7 @@
 package com.kolos.gatewayservice.filter;
 
 import com.kolos.gatewayservice.RouteValidator;
+import com.kolos.gatewayservice.exception.SecurityException;
 import com.kolos.gatewayservice.util.JwtUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             if (validator.isSecured.test(request)) {
                 if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    throw new RuntimeException("Authorization header not present");
+                    throw new SecurityException("Authorization header not present");
                 }
 
                 String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
@@ -51,7 +52,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 } catch (Exception e) {
                     log.info("Check token failed");
-                    throw new RuntimeException("Check token failed");
+                    throw new SecurityException("Check token failed");
                 }
             }
 
